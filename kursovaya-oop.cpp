@@ -1,20 +1,74 @@
-﻿// kursovaya-oop.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
-//
+﻿#include <iostream>
+#include <string>
+#include <fstream>
+#include "Popular_sort.h"
+using namespace std;
 
-#include <iostream>
+//название фирмы, вакантная должность, заработная плата, требования к кандидату: пол, возраст, образование, общий стаж, стаж работы в последней занимаемой должности.
+
+class Unemployed {
+private:
+    string surname;
+    string sex;
+    int age;
+    string education;
+    string profession;
+    string position;
+    int last_experience;
+    int sum_experience;
+    string date;
+    string desired_position;
+    int desired_salary;
+    
+};
+
+class Vacancy {
+private:
+    string company;
+    string offer_position;
+    int offer_salary;
+    string offer_sex;
+    int offer_min_age;
+    int offer_max_age;
+    string offer_education;
+    int offer_last_experience;
+    int offer_sum_experience;
+};
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    setlocale(LC_ALL, "ru");
+
+    job_sort();
+    /*ofstream freader;
+    string path = "unemployed.txt";
+
+    freader.open(path, ofstream::app);
+    if (freader.is_open()) {
+        cout << "File open" << endl;
+        freader << "\nДополнительная строка";
+    }
+    else {
+        cout << "Error" << endl;
+    }
+    freader.close();*/
+
+    /*ifstream finput;
+    finput.open("unemployed.txt");
+    if (finput.is_open()) {
+        cout << "File open" << endl;
+        string ch[15];
+        int i = 0;
+        while (!finput.eof()) {
+            finput >> ch[i];
+            cout << ch[i] << endl;
+            i++;
+        }
+    }
+    else {
+        cout << "Error" << endl;
+    }
+    finput.close();*/
+
+    return 0;
 }
-
-// Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
-// Отладка программы: F5 или меню "Отладка" > "Запустить отладку"
-
-// Советы по началу работы 
-//   1. В окне обозревателя решений можно добавлять файлы и управлять ими.
-//   2. В окне Team Explorer можно подключиться к системе управления версиями.
-//   3. В окне "Выходные данные" можно просматривать выходные данные сборки и другие сообщения.
-//   4. В окне "Список ошибок" можно просматривать ошибки.
-//   5. Последовательно выберите пункты меню "Проект" > "Добавить новый элемент", чтобы создать файлы кода, или "Проект" > "Добавить существующий элемент", чтобы добавить в проект существующие файлы кода.
-//   6. Чтобы снова открыть этот проект позже, выберите пункты меню "Файл" > "Открыть" > "Проект" и выберите SLN-файл.
