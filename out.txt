@@ -1,8 +1,0 @@
-Job count:
-one: 3
-three: 1
-two: 1
-Job percenc:
-one: 60%
-three: 20%
-two: 20%
