@@ -4,9 +4,8 @@
 #include <Windows.h>
 #include <cstdlib>
 #include<queue>
+#include <map>
 
-
-#include "Popular_sort.h"
 using namespace std;
 
 
@@ -115,6 +114,60 @@ public:
 
 };
 
+//Получение списка безработных из файла
+void get_unemployee(queue<Unemployed>& q, string filename) {
+    Unemployed person_for_queue;
+    fstream get_people;
+    get_people.open(filename, fstream::in | fstream::out | fstream::app);
+    if (!get_people.is_open())
+    {
+        cout << "Ошибка при открытии файла unemployed" << endl;
+    }
+    else
+    {
+        while (!get_people.eof())
+        {
+            string _surname, _age, _profession, _last_position, _date,
+                _sex, _education, _last_experience, _sum_experience, _desired_position, _desired_salary, skip;
+            get_people >> _surname >> _age >> _profession >> _last_position >> _date >>
+                _sex >> _education >> _last_experience >> _sum_experience >> _desired_position >> _desired_salary >> skip;
+
+            person_for_queue.update(_surname, stoi(_age), _profession, _last_position, stoi(_date),
+                _sex, _education, stoi(_last_experience), stoi(_sum_experience), _desired_position, stoi(_desired_salary));
+
+            q.push(person_for_queue);
+        }
+    }
+    get_people.close();
+}
+
+//Получение списка вакансий из файла
+void get_vacancy(queue<Vacancy>& q, string filename) {
+    Vacancy offer_for_queue;
+    fstream get_offer;
+    get_offer.open(filename, fstream::in | fstream::out | fstream::app);
+    if (!get_offer.is_open())
+    {
+        cout << "Ошибка при открытии файла vacancy" << endl;
+    }
+    else
+    {
+        while (!get_offer.eof())
+        {
+            string _company, _offer_min_age, _offer_max_age,
+                _sex, _education, _last_experience, _sum_experience, _desired_position, _desired_salary, skip;
+            get_offer >> _company >> _offer_min_age >> _offer_max_age >>
+                _sex >> _education >> _last_experience >> _sum_experience >> _desired_position >> _desired_salary >> skip;
+
+            offer_for_queue.update(_company, stoi(_offer_min_age), stoi(_offer_max_age),
+                _sex, _education, stoi(_last_experience), stoi(_sum_experience), _desired_position, stoi(_desired_salary));
+
+            q.push(offer_for_queue);
+        }
+    }
+    get_offer.close();
+}
+
 int main()
 {
     setlocale(LC_ALL, "ru");
@@ -123,139 +176,74 @@ int main()
     string vacancy_path = "vacancy.txt";
     string output_path = "out.txt";
 
-    Unemployed person;
     queue<Unemployed> people_queue;
-
-    Vacancy job;
     queue<Vacancy> offer_queue;
 
-    //fstream get_people;
-    //get_people.open(unemployed_path, fstream::in | fstream::out | fstream::app);
-    //if (!get_people.is_open()) 
-    //{
-    //    cout << "Ошибка при открытии файла unemployed" << endl;
-    //}
-    //else 
-    //{
-    //    while (!get_people.eof()) 
-    //    {
-    //        string _surname, _age, _profession, _last_position, _date,
-    //            _sex, _education, _last_experience, _sum_experience, _desired_position, _desired_salary, skip;
-    //        get_people >> _surname >> _age >> _profession >> _last_position >> _date >>
-    //            _sex >> _education >> _last_experience >> _sum_experience >> _desired_position >> _desired_salary >> skip;
+    map <string, int> position;
+    map <string, int> company;
 
-    //        person.update(_surname, stoi(_age), _profession, _last_position, stoi(_date),
-    //            _sex, _education, stoi(_last_experience), stoi(_sum_experience), _desired_position, stoi(_desired_salary));
-
-    //        //cout << person.age << " " << person.surname << " " << person.desired_salary << " " << person.sex << endl;
-
-    //        people_queue.push(person);
-
-    //        //cout << people_queue.size() << endl;
-    //    }
-    //}
-    //get_people.close();
-
-    //cout << "\n\n\n" << endl;
-
-    //fstream get_offer;
-    //get_offer.open(vacancy_path, fstream::in | fstream::out | fstream::app);
-    //if (!get_offer.is_open()) 
-    //{
-    //    cout << "Ошибка при открытии файла vacancy" << endl;
-    //}
-    //else 
-    //{
-    //    while (!get_offer.eof()) 
-    //    {
-    //        string _company, _offer_min_age, _offer_max_age,
-    //            _sex, _education, _last_experience, _sum_experience, _desired_position, _desired_salary, skip;
-    //        get_offer >> _company >> _offer_min_age >> _offer_max_age >>
-    //            _sex >> _education >> _last_experience >> _sum_experience >> _desired_position >> _desired_salary >> skip;
-
-    //        job.update(_company, stoi(_offer_min_age), stoi(_offer_max_age),
-    //            _sex, _education, stoi(_last_experience), stoi(_sum_experience), _desired_position, stoi(_desired_salary));
-
-    //        //cout << job.company << " " << job.education << " " << job.offer_min_age << " " << job.offer_max_age << endl;
-
-    //        offer_queue.push(job);
-
-    //        //cout << offer_queue.size() << endl;
-    //    }
-    //}
-    //get_offer.close();
+    int get_job = 0;
 
     //Модель работы биржи труда в течение 30 дней
+    fstream out;
+    out.open(output_path, fstream::out | fstream::trunc);
     for (int i = 1; i <= 30; i++) 
     {
-        cout << "День " << i << endl;
-        int people_per_day = rand() % 4; //в день от 0 до 3 человек
-        cout << "Человек в день: " << people_per_day << endl;
+        out << "----------День " << i << "----------" "\n\n";
+        //В день от 0 до 3 человек
+        int people_per_day = rand() % 4; 
+        out << "Человек в день: " << people_per_day << "\n\n";
         for (int n = 1; n <= people_per_day; n++) 
         {
-            cout << n << endl;
-            //Даём человку 3 вакансии, он выбирает первую подхящую
-            for (int m = 1; m <= 3; m++)
+            //Если в очереди нет людей, то заполняем её из файла
+            if (people_queue.empty()) 
             {
-                if (people_queue.empty()) //Если в очереди нет людей, то заполняем её из файла
+                //Получение списка безработных из файла
+                get_unemployee(people_queue, unemployed_path);
+            }
+
+
+            //Если в очереди нет вакансий, то заполняем её из файла
+            if (offer_queue.empty())
+            {
+                //Получение списка вакансий из файла
+                get_vacancy(offer_queue, vacancy_path);
+            }
+
+
+
+            //Выводим информацию о безработном
+            out << "Информация о безработном номер  " << n << " :" << "\n";
+            out << "Фамилия: " << people_queue.front().surname << "\n";
+            out << "Возраст: " << people_queue.front().age << "\n";
+            out << "Пол: " << people_queue.front().sex << "\n";
+            out << "Образование: " << people_queue.front().education << "\n";
+            out << "Стаж работы в последней занимаемой должности: " << people_queue.front().last_experience << "\n";
+            out << "Общий стаж: " << people_queue.front().sum_experience << "\n";
+            out << "Дата постановки на учёт: " << people_queue.front().date << "\n";
+            out << "Желаемая должность: " << people_queue.front().desired_position << "\n";
+            out << "Желаемая зарплата: " << people_queue.front().desired_salary << "\n\n\n";
+
+            //Даём безработному до 10 вакансий, он выбирает первую подхящую
+            for (int m = 1; m <= 10; m++)
+            {
+
+                //Если в очереди нет людей, то заполняем её из файла
+                if (people_queue.empty())
                 {
-                    fstream get_people;
-                    get_people.open(unemployed_path, fstream::in | fstream::out | fstream::app);
-                    if (!get_people.is_open())
-                    {
-                        cout << "Ошибка при открытии файла unemployed" << endl;
-                    }
-                    else
-                    {
-                        while (!get_people.eof())
-                        {
-                            string _surname, _age, _profession, _last_position, _date,
-                                _sex, _education, _last_experience, _sum_experience, _desired_position, _desired_salary, skip;
-                            get_people >> _surname >> _age >> _profession >> _last_position >> _date >>
-                                _sex >> _education >> _last_experience >> _sum_experience >> _desired_position >> _desired_salary >> skip;
-
-                            person.update(_surname, stoi(_age), _profession, _last_position, stoi(_date),
-                                _sex, _education, stoi(_last_experience), stoi(_sum_experience), _desired_position, stoi(_desired_salary));
-
-                            //cout << person.age << " " << person.surname << " " << person.desired_salary << " " << person.sex << endl;
-
-                            people_queue.push(person);
-
-                            //cout << people_queue.size() << endl;
-                        }
-                    }
-                    get_people.close();
+                    //Получение списка безработных из файла
+                    get_unemployee(people_queue, unemployed_path);
                 }
 
-                if (offer_queue.empty()) //Если в очереди нет вакансий, то заполняем её из файла
+                //Если в очереди нет вакансий, то заполняем её из файла
+                if (offer_queue.empty())
                 {
-                    fstream get_offer;
-                    get_offer.open(vacancy_path, fstream::in | fstream::out | fstream::app);
-                    if (!get_offer.is_open())
-                    {
-                        cout << "Ошибка при открытии файла vacancy" << endl;
-                    }
-                    else
-                    {
-                        while (!get_offer.eof())
-                        {
-                            string _company, _offer_min_age, _offer_max_age,
-                                _sex, _education, _last_experience, _sum_experience, _desired_position, _desired_salary, skip;
-                            get_offer >> _company >> _offer_min_age >> _offer_max_age >>
-                                _sex >> _education >> _last_experience >> _sum_experience >> _desired_position >> _desired_salary >> skip;
-
-                            job.update(_company, stoi(_offer_min_age), stoi(_offer_max_age),
-                                _sex, _education, stoi(_last_experience), stoi(_sum_experience), _desired_position, stoi(_desired_salary));
-
-                            //cout << job.company << " " << job.education << " " << job.offer_min_age << " " << job.offer_max_age << endl;
-
-                            offer_queue.push(job);
-
-                            //cout << offer_queue.size() << endl;
-                        }
-                    }
-                    get_offer.close();
+                    //Получение списка вакансий из файла
+                    get_vacancy(offer_queue, vacancy_path);
                 }
+
+                position[offer_queue.front().desired_position]++;
+                company[offer_queue.front().company]++;
 
                 //Проверяем, подходит ли человеку вакансия
                 if ((people_queue.front().age >= offer_queue.front().offer_min_age) &&
@@ -267,107 +255,65 @@ int main()
                     (people_queue.front().desired_position == "-" || people_queue.front().desired_position == offer_queue.front().desired_position) &&
                     (people_queue.front().desired_salary <= offer_queue.front().desired_salary))
                 {
-                    cout << "Подходит" << endl;
+                    //cout << "Подходит" << endl;
+                    out << "Найдена подходящая работа!" << "\n";
+                    out << "Работодатель: " << offer_queue.front().company << "\n";
+                    out << "Должность: " << offer_queue.front().desired_position << "\n";
+                    out << "Зарплата: " << offer_queue.front().desired_salary << "\n\n\n";
+                    get_job++;
                     offer_queue.pop();
-                    m = 4;
+                    m = 999;
                 }
                 else
                 {
-                    cout << "Не подходит" << endl;
+                    //cout << "Не подходит" << endl;
+                    out << "Вакансия не подходит!" << "\n";
+                    out << "Работодатель: " << offer_queue.front().company << "\n";
+                    out << "Должность: " << offer_queue.front().desired_position << "\n";
+                    out << "Зарплата: " << offer_queue.front().desired_salary << "\n\n\n";
                     offer_queue.pop();
                 }
+
             }
             people_queue.pop();
         }
-        cout << "\n\n" << endl;
     }
 
-    //job_sort();
+    out << "----------Итоги----------" << "\n\n";
 
-    /*ofstream freader;
-    string path = "unemployed.txt";
+    map <string, int>::iterator cur;
+    int num_pos = 0;
+    string name_pos;
+    int num_comp = 0;
+    string name_comp;
 
-    freader.open(path, ofstream::app);
-    if (freader.is_open()) {
-        cout << "File open" << endl;
-        freader << "\nДополнительная строка";
-    }
-    else {
-        cout << "Error" << endl;
-    }
-    freader.close();*/
-
-    /*ifstream finput;
-    finput.open("unemployed.txt");
-    if (finput.is_open()) {
-        cout << "File open" << endl;
-        string ch[15];
-        int i = 0;
-        while (!finput.eof()) {
-            finput >> ch[i];
-            cout << ch[i] << endl;
-            i++;
-        }
-    }
-    else {
-        cout << "Error" << endl;
-    }
-    finput.close();*/
-
-
-    //read and write to file
-    /*fstream fs;
-    fs.open(path, fstream::in | fstream::out | fstream::app);
-    if (!fs.is_open())
+    //Поиск самой востребованной профессии
+    for (cur = position.begin(); cur != position.end(); cur++)
     {
-        cout << "Ошибка при открытии файла" << endl;
-    }
-    else {
-        cout << "Файл успешно открыт" << endl;
-        string msg;
-        int value = 0;
-        cout << "1 для запись в файл" << endl;
-        cout << "2 для чтение из файла" << endl;
-        cin >> value;
-
-        switch (value)
+        if ((*cur).second > num_pos)
         {
-            case 1: {
-                cout << "запись" << endl;
-                SetConsoleCP(1251);
-                cin >> msg;
-                fs << msg << "\n";
-                SetConsoleCP(866);
-                break;
-            }
-            case 2: {
-                cout << "чтение" << endl;
-                while (!fs.eof()) {
-                    msg = "";
-                    fs >> msg;
-                    cout << msg << endl;
-
-                }
-                break;
-            }
-            default: {
-                cout << "ошибка ввода" << endl;
-                break;
-            }
+            num_pos = (*cur).second; name_pos = (*cur).first;
         }
-
     }
-    fs.close();*/
 
-    //string to int
-    /*string input;
-    std::cout << "Введите число: ";
-    std::cin >> input;
+    //Поиск самой популярной компании
+    for (cur = company.begin(); cur != company.end(); cur++)
+    {
+        if ((*cur).second > num_comp)
+        {
+            num_comp = (*cur).second; name_comp = (*cur).first;
+        }
+    }
 
-    int value = stoi(input);
-    std::cout << "Введенное число - " << value << ", удвоим его = " << (value * 2);*/
+    out << "За месяц " << get_job << " человек(а) получили работу" << "\n\n";
 
+    out << "Самая востребованная профессия: " << name_pos << "\n";
+    out << "Количество вакансий: " << num_pos << "\n\n";
 
+    out << "Самая популярная компания: " << name_comp << "\n";
+    out << "Количество вакансий: " << num_comp << "\n\n";
+
+    out.close();
 
     return 0;
 }
