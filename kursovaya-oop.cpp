@@ -3,7 +3,7 @@
 #include <fstream>
 #include <Windows.h>
 #include <cstdlib>
-#include<queue>
+#include <queue>
 #include <map>
 
 using namespace std;
